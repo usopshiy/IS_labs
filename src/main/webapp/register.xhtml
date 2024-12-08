@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<f:view>
+    <h:head>
+        <title>IS_lab1_registration</title>
+    </h:head>
+    <h:body>
+        <h2>Register</h2>
+        <p:panelGrid id="grid" style="text-align:center">
+            <h:form id="register_form">
+                <p:message for="register_form"/>
+                <p:row>
+                    <p:outputLabel for="@next" value="Username"/>
+                    <div class="ui-inputgroup">
+                        <div class="ui-inputgroup-addon">
+                            <i class="pi pi-user"/>
+                        </div>
+                        <p:inputText placeholder="Username" value="#{userBean.user.username}" required="true"/>
+                    </div>
+                </p:row>
+                <p:row>
+                    <p:outputLabel for="@next" value="Password"/>
+                    <div class="ui-inputgroup">
+                        <p:password match="pwd2" value="#{userBean.user.password}" feedback="true" toggleMask="true" redisplay="true" required="true"/>
+                    </div>
+                    <p:outputLabel for="@next" value="Repeat password"/>
+                    <div class="ui-inputgroup">
+                        <p:password id="pwd2" value="#{userBean.user.password}" toggleMask="true" redisplay="true" required="true"/>
+                    </div>
+                </p:row>
+                <p:row>
+                    <p:commandButton value="Sign Up" action="#{userBean.register()}" update="register_form"/>
+                </p:row>
+            </h:form>
+            <p:row>
+                <p:messages id="messages" showDetail="true">
+                    <p:autoUpdate/>
+                </p:messages>
+            </p:row>
+        </p:panelGrid>
+    </h:body>
+</f:view>
+</html>

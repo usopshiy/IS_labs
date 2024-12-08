@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<f:view>
+    <h:head>
+        <title>IS_lab1</title>
+    </h:head>
+    <h:body>
+        <div>
+            <h2>Login into application</h2>
+            <h:form id="login_form">
+                <p:message for="login_form"/>
+                <h:panelGrid id="grid" style="text-align:center">
+                    <p:row>
+                        <p:outputLabel for="@next" value="Username"/>
+                        <div class="ui-inputgroup">
+                           <div class="ui-inputgroup-addon">
+                               <i class="pi pi-user"/>
+                           </div>
+                            <p:inputText placeholder="Username" value="#{userBean.user.username}" required="true"/>
+                        </div>
+                    </p:row>
+                    <p:row>
+                        <p:outputLabel for="@next" value="Password"/>
+                        <div class="ui-inputgroup">
+                            <p:password value="#{userBean.user.password}" toggleMask="true" redisplay="true" required="true"/>
+                        </div>
+                    </p:row>
+                    <p:row>
+                        <p:commandButton value="Log In" action="#{userBean.login()}" update="login_form"/>
+                    </p:row>
+                    <p:row>
+                        <p:outputLabel for="@next" value="No account Yet?"/>
+                        <div>
+                            <p:button value="Sign Up" outcome="register"/>
+                        </div>
+                    </p:row>
+                </h:panelGrid>
+            </h:form>
+        </div>
+    </h:body>
+</f:view>
+</html>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<f:view>
+    <h:head>
+
+    </h:head>
+    <h:body>
+        <h:form>
+            <p:menubar>
+                <p:menuitem disabled="true">
+                    <i class="pi pi-user"/>
+                    <h:outputText value=" #{userBean.user.username}"/>
+                </p:menuitem>
+                <p:menuitem icon="pi pi-fw pi-sign-out" action="#{userBean.logout()}"/>
+                <p:divider layout="vertical"/>
+                <p:menuitem value="main" outcome="main"/>
+                <p:submenu label="Operations">
+                    <p:menuitem value="Basic" outcome="control"/>
+                    <p:menuitem value="Special" outcome="operation"/>
+                </p:submenu>
+                <p:menuitem value="administration" outcome="admin"/>
+            </p:menubar>
+        </h:form>
+        <p:panel header="Collection">
+            <p:dataTable var="route" value="#{route_bean.routes}" rows="10"
+                         paginator="true" paginatorPosition="both"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records">
+
+                <p:column headerText="id">
+                    <h:outputText value="#{route.id}"/>
+                </p:column>
+                <p:column headerText="name">
+                    <h:outputText value="#{route.name}"/>
+                </p:column>
+                <p:column headerText="coordinates">
+                    <h:outputText value="#{route.coordinates}"/>
+                </p:column>
+                <p:column headerText="from">
+                    <h:outputText value="#{route.from}"/>
+                </p:column>
+                <p:column headerText="to">
+                    <h:outputText value="#{route.to}"/>
+                </p:column>
+                <p:column headerText="distance">
+                    <h:outputText value="#{route.distance}"/>
+                </p:column>
+                <p:column headerText="rating">
+                    <h:outputText value="#{route.rating}"/>
+                </p:column>
+            </p:dataTable>
+        </p:panel>
+    </h:body>
+    <h:outputLabel value="Hello, world"/>
+</f:view>
+</html>
