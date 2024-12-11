@@ -5,6 +5,10 @@ target/
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
+.idea/
+.idea/dataSources.xml
+.idea/encodings.xml
+.idea/misc.xml
 .idea/jarRepositories.xml
 .idea/compiler.xml
 .idea/libraries/
@@ -36,3 +40,8 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Other ###
+IS_lab1.iml
+mvnw
+mvnw.cmd
