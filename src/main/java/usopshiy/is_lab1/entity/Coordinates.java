@@ -2,18 +2,19 @@ package usopshiy.is_lab1.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
+import java.io.Serializable;
 
 @Getter
 @Setter
 @Entity
 @Table(name="COORDINATES")
 @AllArgsConstructor
-@NoArgsConstructor
-public class Coordinates implements Comparable<Coordinates> {
+@EqualsAndHashCode
+public class Coordinates implements Comparable<Coordinates>, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,5 +33,21 @@ public class Coordinates implements Comparable<Coordinates> {
             return 1;
         }
         return (this.id == coordinates.getId() ? 0:-1);
+    }
+
+    public Coordinates() {
+        this.id = 0;
+        this.x = 0F;
+        this.y = 0;
+    }
+
+    @Override
+    public String toString() {
+        return id + " " + x + " " + y;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof Coordinates && ((Coordinates) o).getId() == id;
     }
 }

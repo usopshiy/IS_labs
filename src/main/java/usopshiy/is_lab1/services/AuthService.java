@@ -28,11 +28,9 @@ public class AuthService {
 
     public User loginUser(User user) {
         User loggedUser;
-        String oldPassword = user.getPassword();
         loggedUser = userDAO.getUserByName(user.getUsername());
         String password = PasswordHasher.encode(user.getPassword());
         if (!(loggedUser == null) && loggedUser.getPassword().equals(password)) {
-            loggedUser.setPassword(oldPassword);
             return loggedUser;
         }
         return null;

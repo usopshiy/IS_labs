@@ -16,18 +16,45 @@
                 <i class="pi pi-user"/>
                 <h:outputText value=" #{userBean.user.username}"/>
             </p:menuitem>
-            <p:menuitem style="margin-right:0">
-                <p:commandButton action="#{userBean.logout()}" icon="pi pi-fw pi-sign-out"/>
-            </p:menuitem>
+            <p:menuitem icon="pi pi-fw pi-sign-out" action="#{userBean.logout()}"/>
             <p:divider layout="vertical"/>
-            <p:menuitem value="main" outcome="main"/>
+            <p:menuitem value="main" action="#{route_bean.toMain()}"/>
             <p:submenu label="Operations">
-                <p:menuitem value="Basic" outcome="control"/>
+                <p:menuitem value="Basic" action="#{route_bean.toControl()}"/>
                 <p:menuitem value="Special" outcome="operation"/>
             </p:submenu>
             <p:menuitem value="administration" outcome="admin"/>
         </p:menubar>
+        <h:form rendered="#{!(userBean.user.admin)}" id="requestForm">
+            <p:panelGrid>
+                <p:panel rendered="#{userBean.user.roleRequested}">
+                    <h:outputText>You already submitted your request, please wait</h:outputText>
+                </p:panel>
+                <p:panel rendered="#{!(userBean.user.roleRequested)}">
+                    <p:commandButton action="#{userBean.requestAdmin()}" update="@form" value="I want to becme an admin!"/>
+                </p:panel>
+            </p:panelGrid>
+        </h:form>
+        <h:form rendered="#{userBean.user.admin}">
+            <p:dataTable value="#{userBean.users}" var="user" rows="10" id="dt-requests" class="dt-requests"
+                         paginator="true" paginatorPosition="bottom" filteredValue="#{userBean.filteredRequests}"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records">
+                <p:column headerText="User ID" filterBy="#{user.id}" sortBy="#{user.id}">
+                    <h:outputText value="#{user.id}"/>
+                </p:column>
+                <p:column headerText="Username" sortBy="#{user.username}" filterBy="#{user.username}">
+                    <h:outputText value="#{user.username}"/>
+                </p:column>
+                <p:column exportable="false" HeaderText="Actions">
+                    <p:commandButton icon="pi pi-check" action="#{userBean.answerRequest(true, user)}" update="@form"
+                                     styleClass="edit-button rounded-button ui-button-success"/>
+                    <p:commandButton class="ui-button-danger rounded-button" icon="pi pi-times"
+                                     action="#{userBean.answerRequest(false, user)}" update="@form"/>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
     </h:body>
-    <h:outputLabel value="Hello, world"/>
 </f:view>
 </html>

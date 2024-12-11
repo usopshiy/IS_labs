@@ -5,29 +5,194 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:o="http://omnifaces.org/ui"
+      xmlns:of="http://omnifaces.org/functions">
 <f:view>
     <h:head>
 
     </h:head>
     <h:body>
-        <p:menubar>
-            <p:menuitem disabled="true">
-                <i class="pi pi-user"/>
-                <h:outputText value=" #{userBean.user.username}"/>
-            </p:menuitem>
-            <p:menuitem style="margin-right:0">
-                <p:commandButton action="#{userBean.logout()}" icon="pi pi-fw pi-sign-out"/>
-            </p:menuitem>
-            <p:divider layout="vertical"/>
-            <p:menuitem value="main" outcome="main"/>
-            <p:submenu label="Operations">
-                <p:menuitem value="Basic" outcome="control"/>
-                <p:menuitem value="Special" outcome="operation"/>
-            </p:submenu>
-            <p:menuitem value="administration" outcome="admin"/>
-        </p:menubar>
+        <h:form>
+            <p:menubar>
+                <p:menuitem disabled="true">
+                    <i class="pi pi-user"/>
+                    <h:outputText value=" #{userBean.user.username}"/>
+                </p:menuitem>
+                <p:menuitem icon="pi pi-fw pi-sign-out" action="#{userBean.logout()}"/>
+                <p:divider layout="vertical"/>
+                <p:menuitem value="main" action="#{route_bean.toMain()}"/>
+                <p:submenu label="Operations">
+                    <p:menuitem value="Basic" action="#{route_bean.toControl()}"/>
+                    <p:menuitem value="Special" outcome="operation"/>
+                </p:submenu>
+                <p:menuitem value="administration" outcome="admin"/>
+            </p:menubar>
+        </h:form>
+        <h:form>
+            <p:toolbar>
+                <p:toolbarGroup>
+                    <p:commandButton value="New" icon="pi pi-plus" actionListener="#{route_bean.openNew()}"
+                                     update=":dialogs:manage-route-content" oncomplete="PF('manageRouteDialog').show()"
+                                     styleClass="ui-button-success" style="margin-right: .5rem">
+                        <p:resetInput target=":dialogs:manage-route-content" />
+                    </p:commandButton>
+                </p:toolbarGroup>
+            </p:toolbar>
+            <f:websocket channel="pushContext" onMessage="#{route_bean.filterUserRoutes()}">
+                <p:ajax event="update" update="@form"/>
+            </f:websocket>
+            <p:dataTable value="#{route_bean.routes}" var="route" rows="10" id="dt-routes" class="dt-routes"
+                         paginator="true" paginatorPosition="bottom" filteredValue="#{route_bean.filteredRoutes}"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records">
+                <p:column headerText="id" filterBy="#{route.id}" sortBy="#{route.id}">
+                    <h:outputText value="#{route.id}"/>
+                </p:column>
+                <p:column headerText="onwer" filterBy="#{route.owner.username}" sortBy="#{route.owner.username}">
+                    <h:outputText value="#{route.owner.username}"/>
+                </p:column>
+                <p:column headerText="name" filterBy="#{route.name}" sortBy="#{route.name}">
+                    <h:outputText value="#{route.name}"/>
+                </p:column>
+                <p:column headerText="coordinates" filterBy="#{route.coordinates.toString()}" sortBy="#{route.coordinates.toString()}">
+                    <h:outputText value="#{route.coordinates.toString()}"/>
+                </p:column>
+                <p:column headerText="from" filterBy="#{route.from.toString()}" sortBy="#{route.from.toString()}">
+                    <h:outputText value="#{route.from.toString()}"/>
+                </p:column>
+                <p:column headerText="to" filterBy="#{route.to.toString()}" sortBy="#{route.to.toString()}">
+                    <h:outputText value="#{route.to.toString()}"/>
+                </p:column>
+                <p:column headerText="distance" filterBy="#{route.distance}" sortBy="#{route.distance}">
+                    <h:outputText value="#{route.distance}"/>
+                </p:column>
+                <p:column headerText="rating" filterBy="#{route.rating}" sortBy="#{route.rating}">
+                    <h:outputText value="#{route.rating}"/>
+                </p:column>
+                <p:column exportable="false" ariaHeaderText="Actions">
+                    <p:commandButton icon="pi pi-pencil" update=":dialogs:manage-route-content"
+                                     oncomplete="PF('manageRouteDialog').show()"
+                                     styleClass="edit-button rounded-button ui-button-success" process="@this">
+                        <f:setPropertyActionListener value="#{route}" target="#{route_bean.route}" />
+                        <p:resetInput target=":dialogs:manage-route-content" />
+                    </p:commandButton>
+                    <p:commandButton class="ui-button-warning rounded-button" icon="pi pi-trash"
+                                     process="@this"
+                                     oncomplete="PF('deleteRouteDialog').show()">
+                        <f:setPropertyActionListener value="#{route}" target="#{route_bean.route}" />
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <h:form id="dialogs">
+            <p:dialog header="Route Details" showEffect="fade" modal="true" widgetVar="manageRouteDialog"
+                      responsive="true" id="routeDialog">
+                <p:outputPanel id="manage-route-content" class="ui-fluid">
+                    <p:outputPanel rendered="#{not empty route_bean.route}">
+                        <div class="field">
+                            <p:outputLabel for="name">Name</p:outputLabel>
+                            <p:inputText id="name" value="#{route_bean.route.name}" required="true" />
+                        </div>
+                        <div class="field">
+                            <p:outputLabel for="@next">Coordinates</p:outputLabel>
+                            <p:selectOneMenu class="cordsSelector" id="cordsSelector" value="#{route_bean.route.coordinates}" converter="omnifaces.SelectItemsConverter" required="true">
+                                <f:selectItem itemValue="#{null}" itemLabel="SelectOne"/>
+                                <f:selectItems value="#{coordinates_bean.allCoordinates}" var="coordinates"
+                                itemLabel="#{coordinates.toString()}" itemValue="#{coordinates}"/>
+                                <f:selectItem itemValue="#{coordinates_bean.coordinates}" itemLabel="Add new coordinates"/>
+                                <p:ajax listener="#{coordinates_bean.addNewCoordinatesIfNeccessary}"/>
+                                <f:facet name="footer">
+                                    <h:outputText value="#{coordinates_bean.allCoordinates.size()} coordinates"
+                                                  style="font-weight:bold;" styleClass="py-1 block"/>
+                                </f:facet>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="field">
+                            <p:outputLabel for="@next">From</p:outputLabel>
+                            <p:selectOneMenu class="locSelector" id="fromSelector" value="#{route_bean.route.from}" converter="omnifaces.SelectItemsConverter" required="true">
+                                <f:selectItem itemValue="#{null}" itemLabel="SelectOne"/>
+                                <f:selectItems value="#{location_bean.allLocations}"/>
+                                <f:selectItem itemValue="#{location_bean.location}" itemLabel="Add new Location"/>
+                                <p:ajax listener="#{location_bean.addNewLocationIfNeccessary}"/>
+                                <f:facet name="footer">
+                                    <h:outputText value="#{location_bean.allLocations.size()} locations"
+                                                  style="font-weight:bold;" styleClass="py-1 block"/>
+                                </f:facet>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="field">
+                            <p:outputLabel for="@next">To</p:outputLabel>
+                            <p:selectOneMenu class="locSelector" id="toSelector" value="#{route_bean.route.to}" converter="omnifaces.SelectItemsConverter" required="true">
+                                <f:selectItem itemValue="#{null}" itemLabel="SelectOne"/>
+                                <f:selectItems value="#{location_bean.allLocations}"/>
+                                <f:selectItem itemValue="#{location_bean.location}" itemLabel="Add new Location"/>
+                                <p:ajax listener="#{location_bean.addNewLocationIfNeccessary}"/>
+                                <f:facet name="footer">
+                                    <h:outputText value="#{location_bean.allLocations.size()} locations"
+                                                  style="font-weight:bold;" styleClass="py-1 block"/>
+                                </f:facet>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="formgrid grid">
+                            <div class="field col">
+                                <p:outputLabel for="@next">Rating</p:outputLabel>
+                                <p:inputNumber id="rating" value="#{route_bean.route.rating}" minValue="1"/>
+                            </div>
+                            <div class="field col">
+                                <p:outputLabel for="@next">Distance</p:outputLabel>
+                                <p:inputNumber id="distance" value="#{route_bean.route.distance}" minValue="2"/>
+                            </div>
+                        </div>
+                    </p:outputPanel>
+                </p:outputPanel>
+
+                <f:facet name="footer">
+                    <p:commandButton value="Save" icon="pi pi-check" actionListener="#{route_bean.saveRoute()}"
+                                     update="manage-route-content" process="manage-route-content @this" />
+                    <p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('manageRouteDialog').hide()"
+                                     class="ui-button-secondary" type="button" />
+                </f:facet>
+            </p:dialog>
+
+            <p:confirmDialog widgetVar="deleteRouteDialog" showEffect="fade" width="300"
+                             message="Delete the route?" header="Confirm" severity="warn">
+                <p:commandButton value="Yes" icon="pi pi-check" actionListener="#{route_bean.deleteRoute()}"
+                                 process="@this"
+                                 oncomplete="PF('deleteRouteDialog').hide()" />
+                <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+                                 onclick="PF('deleteRouteDialog').hide()" />
+            </p:confirmDialog>
+
+            <p:confirmDialog global="true" showEffect="fade" width="300">
+                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary"
+                                 icon="pi pi-times" />
+            </p:confirmDialog>
+        </h:form>
+        <p:dialog id="addNewCoordinatesDialog">
+            <h:form>
+                <p:outputLabel for="@next">X</p:outputLabel>
+                <p:inputNumber value="#{coordinates_bean.coordinates.x}" required="true" />
+                <p:outputLabel for="@next">Y</p:outputLabel>
+                <p:inputNumber value="#{coordinates_bean.coordinates.y}" maxValue="291" />
+                <p:commandButton value="Add" action="#{coordinates_bean.saveCoordinates()}" update="@([id$=cordsSelector])" />
+                <p:messages />
+            </h:form>
+        </p:dialog>
+        <p:dialog id="addNewLocationDialog">
+            <h:form>
+                <p:outputLabel for="@next">X</p:outputLabel>
+                <p:inputNumber value="#{location_bean.location.x}" />
+                <p:outputLabel for="@next">Y</p:outputLabel>
+                <p:inputNumber value="#{location_bean.location.y}" required="true" />
+                <p:outputLabel for="@next">Z</p:outputLabel>
+                <p:inputNumber value="#{location_bean.location.z}" />
+                <p:commandButton value="Add" action="#{location_bean.saveLocation()}" update="@(.locSelector)" />
+                <p:messages />
+            </h:form>
+        </p:dialog>
     </h:body>
-    <h:outputLabel value="Hello, world"/>
 </f:view>
 </html>

@@ -21,42 +21,45 @@
                 <p:divider layout="vertical"/>
                 <p:menuitem value="main" outcome="main"/>
                 <p:submenu label="Operations">
-                    <p:menuitem value="Basic" outcome="control"/>
+                    <p:menuitem value="Basic" action="#{route_bean.toControl()}"/>
                     <p:menuitem value="Special" outcome="operation"/>
                 </p:submenu>
                 <p:menuitem value="administration" outcome="admin"/>
             </p:menubar>
         </h:form>
+        <f:websocket channel="pushContext" onMessage="#{route_bean.setRoutes()}"/>
         <p:panel header="Collection">
             <p:dataTable var="route" value="#{route_bean.routes}" rows="10"
-                         paginator="true" paginatorPosition="both"
+                         paginator="true" paginatorPosition="both" filteredValue="#{route_bean.filteredRoutes}"
                          paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                          currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records">
 
-                <p:column headerText="id">
+                <p:column headerText="id" filterBy="#{route.id}" sortBy="#{route.id}">
                     <h:outputText value="#{route.id}"/>
                 </p:column>
-                <p:column headerText="name">
+                <p:column headerText="onwer" filterBy="#{route.owner.username}" sortBy="#{route.owner.username}">
+                    <h:outputText value="#{route.owner.username}"/>
+                </p:column>
+                <p:column headerText="name" filterBy="#{route.name}" sortBy="#{route.name}">
                     <h:outputText value="#{route.name}"/>
                 </p:column>
-                <p:column headerText="coordinates">
+                <p:column headerText="coordinates" filterBy="#{route.coordinates}" sortBy="#{route.coordinates.id}">
                     <h:outputText value="#{route.coordinates}"/>
                 </p:column>
-                <p:column headerText="from">
+                <p:column headerText="from" filterBy="#{route.from}" sortBy="#{route.from.id}">
                     <h:outputText value="#{route.from}"/>
                 </p:column>
-                <p:column headerText="to">
+                <p:column headerText="to" filterBy="#{route.to}" sortBy="#{route.to.id}">
                     <h:outputText value="#{route.to}"/>
                 </p:column>
-                <p:column headerText="distance">
+                <p:column headerText="distance" filterBy="#{route.distance}" sortBy="#{route.distance}">
                     <h:outputText value="#{route.distance}"/>
                 </p:column>
-                <p:column headerText="rating">
+                <p:column headerText="rating" filterBy="#{route.rating}" sortBy="#{route.rating}">
                     <h:outputText value="#{route.rating}"/>
                 </p:column>
             </p:dataTable>
         </p:panel>
     </h:body>
-    <h:outputLabel value="Hello, world"/>
 </f:view>
 </html>

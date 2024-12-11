@@ -5,7 +5,11 @@ import jakarta.persistence.PersistenceContext;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Query;
+import usopshiy.is_lab1.entity.Route;
 import usopshiy.is_lab1.entity.User;
+
+import java.util.List;
 
 @Stateless
 public class UserDAO {
@@ -50,5 +54,10 @@ public class UserDAO {
         session.getTransaction().begin();
         session.merge(user);
         session.getTransaction().commit();
+    }
+
+    public List<User> getAllUsers() {
+        Query<User> query = session.createQuery("FROM User", User.class);
+        return query.getResultList();
     }
 }
