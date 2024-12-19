@@ -29,6 +29,7 @@
         </h:form>
         <h:form id="main">
             <p:growl id="growl" showDetail="true"/>
+            <p:growl id="msg"/>
             <p:toolbar>
                 <p:toolbarGroup>
                     <p:commandButton value="Delete route by Rating" actionListener="#{route_bean.newRating()}"
@@ -42,34 +43,52 @@
                                      style="margin-right: .5rem">
                         <p:resetInput target=":dialogs:countHigherRating"/>
                     </p:commandButton>
+                    <p:commandButton value="Find routes by name start" actionListener="#{route_bean.openNew()}"
+                                     update=":dialogs:routeNameStart" styleClass="ui-button-info"
+                                     oncomplete="PF('routeNameStartDialog').show()"
+                                     style="margin-right: .5rem" icon="pi pi-search">
+                        <p:resetInput target=":dialogs:routeNameStart"/>
+                    </p:commandButton>
+                    <p:commandButton value="Find shortest or longest route" actionListener="#{route_bean.openNew()}"
+                                     update=":dialogs:biggestRoute" styleClass="ui-button-info"
+                                     oncomplete="PF('biggestRouteDialog').show()"
+                                     style="margin-right: .5rem" icon="pi pi-search">
+                        <p:resetInput target=":dialogs:biggestRoute"/>
+                    </p:commandButton>
+                    <p:commandButton value="Find routes sorted" actionListener="#{route_bean.openNew()}"
+                                     update=":dialogs:allRoutesFiltered" styleClass="ui-button-info"
+                                     oncomplete="PF('allRoutesFilteredDialog').show()"
+                                     style="margin-right: .5rem" icon="pi pi-search">
+                        <p:resetInput target=":dialogs:allRoutesFiltered"/>
+                    </p:commandButton>
                 </p:toolbarGroup>
             </p:toolbar>
             <p:dataTable var="route" value="#{route_bean.routes}" rows="10" id="dt-routes"
                          paginator="true" paginatorPosition="both" filteredValue="#{route_bean.filteredRoutes}"
                          paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                          currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records">
-                <p:column headerText="id" filterBy="#{route.id}" sortBy="#{route.id}">
+                <p:column field="id" filterMatchMode="contains">
                     <h:outputText value="#{route.id}"/>
                 </p:column>
-                <p:column headerText="onwer" filterBy="#{route.owner.username}" sortBy="#{route.owner.username}">
-                    <h:outputText value="#{route.owner.username}"/>
+                <p:column field="owner" filterMatchMode="contains">
+                    <h:outputText value="#{route.owner}"/>
                 </p:column>
-                <p:column headerText="name" filterBy="#{route.name}" sortBy="#{route.name}">
+                <p:column field="name" filterMatchMode="contains">
                     <h:outputText value="#{route.name}"/>
                 </p:column>
-                <p:column headerText="coordinates" filterBy="#{route.coordinates}" sortBy="#{route.coordinates.id}">
+                <p:column field="coordinates" filterMatchMode="contains">
                     <h:outputText value="#{route.coordinates}"/>
                 </p:column>
-                <p:column headerText="from" filterBy="#{route.from}" sortBy="#{route.from.id}">
+                <p:column field="from" filterMatchMode="contains">
                     <h:outputText value="#{route.from}"/>
                 </p:column>
-                <p:column headerText="to" filterBy="#{route.to}" sortBy="#{route.to.id}">
+                <p:column field="to" filterMatchMode="contains">
                     <h:outputText value="#{route.to}"/>
                 </p:column>
-                <p:column headerText="distance" filterBy="#{route.distance}" sortBy="#{route.distance}">
+                <p:column field="distance" filterMatchMode="contains">
                     <h:outputText value="#{route.distance}"/>
                 </p:column>
-                <p:column headerText="rating" filterBy="#{route.rating}" sortBy="#{route.rating}">
+                <p:column field="rating" filterMatchMode="contains">
                     <h:outputText value="#{route.rating}"/>
                 </p:column>
             </p:dataTable>
@@ -108,76 +127,111 @@
                                      class="ui-button-secondary" type="button"/>
                 </f:facet>
             </p:dialog>
-            <p:dialog header="Route Details" showEffect="fade" modal="true" widgetVar="manageRouteDialog"
-                      responsive="true" id="routeDialog">
-                <p:outputPanel id="manage-route-content" class="ui-fluid">
-                    <p:outputPanel rendered="#{not empty route_bean.route}">
-                        <div class="field">
-                            <p:outputLabel for="name">Name</p:outputLabel>
-                            <p:inputText id="name" value="#{route_bean.route.name}" required="true"/>
-                        </div>
-                        <div class="field">
-                            <p:outputLabel for="@next">Coordinates</p:outputLabel>
-                            <p:selectOneMenu class="cordsSelector" id="cordsSelector"
-                                             value="#{route_bean.route.coordinates}"
-                                             converter="omnifaces.SelectItemsConverter" required="true">
-                                <f:selectItem itemValue="#{null}" itemLabel="SelectOne"/>
-                                <f:selectItems value="#{coordinates_bean.allCoordinates}" var="coordinates"
-                                               itemLabel="#{coordinates.toString()}" itemValue="#{coordinates}"/>
-                                <f:selectItem itemValue="#{coordinates_bean.coordinates}"
-                                              itemLabel="Add new coordinates"/>
-                                <p:ajax listener="#{coordinates_bean.addNewCoordinatesIfNeccessary}"/>
-                                <f:facet name="footer">
-                                    <h:outputText value="#{coordinates_bean.allCoordinates.size()} coordinates"
-                                                  style="font-weight:bold;" styleClass="py-1 block"/>
-                                </f:facet>
-                            </p:selectOneMenu>
-                        </div>
-                        <div class="field">
-                            <p:outputLabel for="@next">From</p:outputLabel>
-                            <p:selectOneMenu class="locSelector" id="fromSelector" value="#{route_bean.route.from}"
-                                             converter="omnifaces.SelectItemsConverter" required="true">
-                                <f:selectItem itemValue="#{null}" itemLabel="SelectOne"/>
-                                <f:selectItems value="#{location_bean.allLocations}"/>
-                                <f:selectItem itemValue="#{location_bean.location}" itemLabel="Add new Location"/>
-                                <p:ajax listener="#{location_bean.addNewLocationIfNeccessary}"/>
-                                <f:facet name="footer">
-                                    <h:outputText value="#{location_bean.allLocations.size()} locations"
-                                                  style="font-weight:bold;" styleClass="py-1 block"/>
-                                </f:facet>
-                            </p:selectOneMenu>
-                        </div>
-                        <div class="field">
-                            <p:outputLabel for="@next">To</p:outputLabel>
-                            <p:selectOneMenu class="locSelector" id="toSelector" value="#{route_bean.route.to}"
-                                             converter="omnifaces.SelectItemsConverter" required="true">
-                                <f:selectItem itemValue="#{null}" itemLabel="SelectOne"/>
-                                <f:selectItems value="#{location_bean.allLocations}"/>
-                                <f:selectItem itemValue="#{location_bean.location}" itemLabel="Add new Location"/>
-                                <p:ajax listener="#{location_bean.addNewLocationIfNeccessary}"/>
-                                <f:facet name="footer">
-                                    <h:outputText value="#{location_bean.allLocations.size()} locations"
-                                                  style="font-weight:bold;" styleClass="py-1 block"/>
-                                </f:facet>
-                            </p:selectOneMenu>
-                        </div>
-                        <div class="formgrid grid">
-                            <div class="field col">
-                                <p:outputLabel for="@next">Rating</p:outputLabel>
-                                <p:inputNumber id="rating" value="#{route_bean.route.rating}" minValue="1"/>
-                            </div>
-                            <div class="field col">
-                                <p:outputLabel for="@next">Distance</p:outputLabel>
-                                <p:inputNumber id="distance" value="#{route_bean.route.distance}" minValue="2"/>
-                            </div>
-                        </div>
-                    </p:outputPanel>
+            <p:dialog header="Find routes by name start" showEffect="fade" modal="true"
+                      widgetVar="routeNameStartDialog"
+                      responsive="true" id="routeNameStartDialog">
+                <p:outputPanel id="routeNameStart" class="ui-fluid">
+                    <div class="field">
+                        <p:outputLabel for="@next">Name start</p:outputLabel>
+                        <p:inputText value="#{route_bean.route.name}" required="true"/>
+                    </div>
                 </p:outputPanel>
-
                 <f:facet name="footer">
-                    <p:commandButton value="Save" icon="pi pi-check" actionListener="#{route_bean.saveRoute()}"
-                                     update="manage-route-content" process="manage-route-content @this"/>
-                    <p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('manageRouteDialog').hide()"
+                    <p:commandButton value="Find" actionListener="#{route_bean.routesByNameStart()}"
+                                     update="routeNameStart" process="routeNameStart @this" icon="pi pi-search"/>
+                    <p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('routeNameStartDialog').hide()"
+                                     class="ui-button-secondary" type="button"/>
+                </f:facet>
+            </p:dialog>
+            <p:dialog header="Find shortest or longest route" showEffect="fade" modal="true"
+                      widgetVar="biggestRouteDialog"
+                      responsive="true" id="biggestRouteDialog">
+                <p:outputPanel id="biggestRoute" class="ui-fluid">
+                    <div class="field">
+                        <p:outputLabel for="@next">From</p:outputLabel>
+                        <p:selectOneMenu class="locSelector" id="fromSelector" value="#{route_bean.route.from}"
+                                         converter="omnifaces.SelectItemsConverter" required="true">
+                            <f:selectItem itemValue="#{null}" itemLabel="SelectOne"/>
+                            <f:selectItems value="#{location_bean.allLocations}"/>
+                            <f:facet name="footer">
+                                <h:outputText value="#{location_bean.allLocations.size()} locations"
+                                              style="font-weight:bold;" styleClass="py-1 block"/>
+                            </f:facet>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="field">
+                        <p:outputLabel for="@next">To</p:outputLabel>
+                        <p:selectOneMenu class="locSelector" id="toSelector" value="#{route_bean.route.to}"
+                                         converter="omnifaces.SelectItemsConverter" required="true">
+                            <f:selectItem itemValue="#{null}" itemLabel="SelectOne"/>
+                            <f:selectItems value="#{location_bean.allLocations}"/>
+                            <f:facet name="footer">
+                                <h:outputText value="#{location_bean.allLocations.size()} locations"
+                                              style="font-weight:bold;" styleClass="py-1 block"/>
+                            </f:facet>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="field">
+                        <h5>Shortest or Longest</h5>
+                        <p:toggleSwitch value="#{route_bean.locationFlag}" offIcon="pi pi-angle-double-down" onIcon="pi pi-angle-double-up">
+                            <p:ajax listener="#{route_bean.addMessage}" update=":main:msg"/>
+                        </p:toggleSwitch>
+                    </div>
+                </p:outputPanel>
+                <f:facet name="footer">
+                    <p:commandButton value="Find" actionListener="#{route_bean.getBiggestRoute()}"
+                                     update="biggestRoute, :main:growl" process="biggestRoute @this" icon="pi pi-search"/>
+                    <p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('biggestRouteDialog').hide()"
+                                     class="ui-button-secondary" type="button"/>
+                </f:facet>
+            </p:dialog>
+            <p:dialog header="Find all routes and sort them by field" showEffect="fade" modal="true"
+                      widgetVar="allRoutesFilteredDialog"
+                      responsive="true" id="allRoutesFilteredDialog">
+                <p:outputPanel id="allRoutesFiltered" class="ui-fluid">
+                    <div class="field">
+                        <p:outputLabel for="@next">From</p:outputLabel>
+                        <p:selectOneMenu class="locSelector" id="fromSelector1" value="#{route_bean.route.from}"
+                                         converter="omnifaces.SelectItemsConverter" required="true">
+                            <f:selectItem itemValue="#{null}" itemLabel="SelectOne"/>
+                            <f:selectItems value="#{location_bean.allLocations}"/>
+                            <f:facet name="footer">
+                                <h:outputText value="#{location_bean.allLocations.size()} locations"
+                                              style="font-weight:bold;" styleClass="py-1 block"/>
+                            </f:facet>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="field">
+                        <p:outputLabel for="@next">To</p:outputLabel>
+                        <p:selectOneMenu class="locSelector" id="toSelector1" value="#{route_bean.route.to}"
+                                         converter="omnifaces.SelectItemsConverter" required="true">
+                            <f:selectItem itemValue="#{null}" itemLabel="SelectOne"/>
+                            <f:selectItems value="#{location_bean.allLocations}"/>
+                            <f:facet name="footer">
+                                <h:outputText value="#{location_bean.allLocations.size()} locations"
+                                              style="font-weight:bold;" styleClass="py-1 block"/>
+                            </f:facet>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="field">
+                        <p:outputLabel for="@next">Sorting filter</p:outputLabel>
+                        <p:selectOneMenu value="#{}" required="true">
+                            <f:selectItem value="id"/>
+                            <f:selectItem value="name"/>
+                            <f:selectItem value="coordinates"/>
+                            <f:selectItem itemValue="creationDate" itemLabel="creation date"/>
+                            <f:selectItem value="from"/>
+                            <f:selectItem value="to"/>
+                            <f:selectItem value="distance"/>
+                            <f:selectItem value="rating"/>
+                            <f:selectItem value="owner"/>
+                        </p:selectOneMenu>
+                    </div>
+                </p:outputPanel>
+                <f:facet name="footer">
+                    <p:commandButton value="Find" actionListener="#{route_bean.getAllRoutesFiltered()}"
+                                     update="allRoutesFiltered, :main:growl" process="allRoutesFiltered @this" icon="pi pi-search"/>
+                    <p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('allRoutesFilteredDialog').hide()"
                                      class="ui-button-secondary" type="button"/>
                 </f:facet>
             </p:dialog>

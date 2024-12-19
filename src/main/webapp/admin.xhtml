@@ -28,7 +28,7 @@
         <h:form rendered="#{!(userBean.user.admin)}" id="requestForm">
             <p:panelGrid>
                 <p:panel rendered="#{userBean.user.roleRequested}">
-                    <h:outputText>You already submitted your request, please wait</h:outputText>
+                    <h:outputText value="You already submitted your request please wait"/>
                 </p:panel>
                 <p:panel rendered="#{!(userBean.user.roleRequested)}">
                     <p:commandButton action="#{userBean.requestAdmin()}" update="@form" value="I want to becme an admin!"/>

@@ -34,28 +34,28 @@
                          paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                          currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records">
 
-                <p:column headerText="id" filterBy="#{route.id}" sortBy="#{route.id}">
+                <p:column field="id" filterMatchMode="contains">
                     <h:outputText value="#{route.id}"/>
                 </p:column>
-                <p:column headerText="onwer" filterBy="#{route.owner.username}" sortBy="#{route.owner.username}">
-                    <h:outputText value="#{route.owner.username}"/>
+                <p:column field="owner" filterMatchMode="contains">
+                    <h:outputText value="#{route.owner}"/>
                 </p:column>
-                <p:column headerText="name" filterBy="#{route.name}" sortBy="#{route.name}">
+                <p:column field="name" filterMatchMode="contains">
                     <h:outputText value="#{route.name}"/>
                 </p:column>
-                <p:column headerText="coordinates" filterBy="#{route.coordinates}" sortBy="#{route.coordinates.id}">
+                <p:column field="coordinates" filterMatchMode="contains">
                     <h:outputText value="#{route.coordinates}"/>
                 </p:column>
-                <p:column headerText="from" filterBy="#{route.from}" sortBy="#{route.from.id}">
+                <p:column field="from" filterMatchMode="contains">
                     <h:outputText value="#{route.from}"/>
                 </p:column>
-                <p:column headerText="to" filterBy="#{route.to}" sortBy="#{route.to.id}">
+                <p:column field="to" filterMatchMode="contains">
                     <h:outputText value="#{route.to}"/>
                 </p:column>
-                <p:column headerText="distance" filterBy="#{route.distance}" sortBy="#{route.distance}">
+                <p:column field="distance" filterMatchMode="contains">
                     <h:outputText value="#{route.distance}"/>
                 </p:column>
-                <p:column headerText="rating" filterBy="#{route.rating}" sortBy="#{route.rating}">
+                <p:column field="rating" filterMatchMode="contains">
                     <h:outputText value="#{route.rating}"/>
                 </p:column>
             </p:dataTable>

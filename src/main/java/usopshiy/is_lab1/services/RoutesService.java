@@ -12,6 +12,7 @@ import usopshiy.is_lab1.entity.Route;
 import usopshiy.is_lab1.entity.User;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Stateless
@@ -86,19 +87,33 @@ public class RoutesService {
     }
 
     public Route getLongestRoute(Location from, Location to) {
-        List<Route> routes = routeDAO.getAllRoutes();
-        return routes.stream()
-                .filter(item -> item.getFrom().equals(from) && item.getTo().equals(to))
-                .reduce((a, b) -> a.getDistance() > b.getDistance() ? a:b)
-                .get();
+        Route longestRoute = null;
+        try {
+            List<Route> routes = routeDAO.getAllRoutes();
+            longestRoute = routes.stream()
+                    .filter(item -> item.getFrom().equals(from) && item.getTo().equals(to))
+                    .reduce((a, b) -> a.getDistance() > b.getDistance() ? a : b)
+                    .get();
+        }
+        catch (NoSuchElementException e) {
+            return null;
+        }
+        return longestRoute;
     }
 
     public Route getShortestRoute(Location from, Location to) {
         List<Route> routes = routeDAO.getAllRoutes();
-        return routes.stream()
-                .filter(item -> item.getFrom().equals(from) && item.getTo().equals(to))
-                .reduce((a, b) -> a.getDistance() < b.getDistance() ? a:b)
-                .get();
+        Route shortestRoute;
+        try {
+            shortestRoute = routes.stream()
+                    .filter(item -> item.getFrom().equals(from) && item.getTo().equals(to))
+                    .reduce((a, b) -> a.getDistance() < b.getDistance() ? a:b)
+                    .get();
+            return shortestRoute;
+        }
+        catch (NoSuchElementException e) {
+            return null;
+        }
     }
 
     public List<Route> getAllRoutesFiltered(Location from, Location to, String field) {

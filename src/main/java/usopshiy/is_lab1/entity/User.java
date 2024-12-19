@@ -39,4 +39,9 @@ public class User implements Comparable<User> {
         }
         return (this.id == user.getId() ? 0:-1);
     }
+
+    @Override
+    public String toString() {
+        return username;
+    }
 }
