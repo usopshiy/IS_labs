@@ -24,7 +24,7 @@
                 <p:menuitem value="main" action="#{route_bean.toMain()}"/>
                 <p:submenu label="Operations">
                     <p:menuitem value="Basic" action="#{route_bean.toControl()}"/>
-                    <p:menuitem value="Special" outcome="operation"/>
+                    <p:menuitem value="Special" action="#{route_bean.toOperation()}"/>
                 </p:submenu>
                 <p:menuitem value="administration" outcome="admin"/>
             </p:menubar>

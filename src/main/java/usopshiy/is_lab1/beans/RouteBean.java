@@ -91,6 +91,15 @@ public class RouteBean implements Serializable {
         }
     }
 
+    public void toOperation() {
+        routes = getAllRoutes();
+        try {
+            FacesContext.getCurrentInstance().getExternalContext().redirect("operation.xhtml");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void saveRoute() {
         if (route.getId() != null && route.getId() > 0) {
             routesService.updateRoute(route);
