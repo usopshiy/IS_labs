@@ -6,7 +6,10 @@ import jakarta.ejb.EJB;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.annotation.ManagedProperty;
 import jakarta.faces.application.FacesMessage;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.component.UIInput;
 import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.AjaxBehaviorEvent;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import lombok.Getter;
@@ -46,6 +49,16 @@ public class RouteBean implements Serializable {
     @Getter
     @Setter
     private int rating;
+
+    @ManagedProperty("location_flag")
+    @Getter
+    @Setter
+    private boolean locationFlag;
+
+    @ManagedProperty("filter")
+    @Getter
+    @Setter
+    private String filter;
 
     @EJB
     private RoutesService routesService;
@@ -89,12 +102,13 @@ public class RouteBean implements Serializable {
         route = new Route();
         filterUserRoutes();
         PrimeFaces.current().executeScript("PF('manageRouteDialog').hide()");
-        PrimeFaces.current().ajax().update("form:messages", "form:dt-routes");
+        PrimeFaces.current().ajax().update("main:messages", "main:dt-routes");
     }
 
     public void deleteRoute() {
         routesService.deleteRoute(route);
         routes.remove(route);
+        PrimeFaces.current().ajax().update("main:messages", "main:dt-routes");
     }
 
     public void openNew() {
@@ -109,14 +123,56 @@ public class RouteBean implements Serializable {
         routesService.deleteRouteByRating(rating, userBean.getUser());
         routes = getAllRoutes();
         PrimeFaces.current().executeScript("PF('routeDeleteRatingDialog').hide()");
-        PrimeFaces.current().ajax().update("form:messages", "form:dt-routes");
+        PrimeFaces.current().ajax().update("main:messages", "main:dt-routes");
     }
 
     public void countHigherRating() {
         long count = routesService.countHigherRatings(rating);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Counted higher ratings routes", String.valueOf(count)));
         PrimeFaces.current().executeScript("PF('countHigherRatingDialog').hide()");
-        PrimeFaces.current().ajax().update("form:messages", "form:dt-routes");
+        PrimeFaces.current().ajax().update("main:messages", "main:dt-routes");
+    }
+
+    public void routesByNameStart() {
+        routes = routesService.getRoutesByNameStart(route.getName());
+        openNew();
+        PrimeFaces.current().executeScript("PF('routeNameStartDialog').hide()");
+        PrimeFaces.current().ajax().update("main:messages", "main:dt-routes");
+    }
+
+    public void getBiggestRoute() {
+        if (locationFlag) {
+            route = routesService.getLongestRoute(route.getFrom(), route.getTo());
+        }
+        else {
+            route = routesService.getShortestRoute(route.getFrom(), route.getTo());
+        }
+
+        if (route != null) {
+            routes.clear();
+            routes.add(route);
+        }
+        else {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "No such routes", "Route between these locations doesn't exist"));
+        }
+        PrimeFaces.current().executeScript("PF('biggestRouteDialog').hide()");
+        PrimeFaces.current().ajax().update("main:messages", "main:dt-routes");
+    }
+
+    public void addMessage(AjaxBehaviorEvent event) {
+        UIComponent component = event.getComponent();
+        if (component instanceof UIInput) {
+            UIInput inputComponent = (UIInput) component;
+            Boolean value = (Boolean) inputComponent.getValue();
+            String summary = value ? "Longest" : "Shortest";
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(summary));
+        }
+    }
+
+    public void getAllRoutesFiltered() {
+        routes = routesService.getAllRoutesFiltered(route.getFrom(), route.getTo(), filter);
+        PrimeFaces.current().executeScript("PF('allRoutesFilteredDialog').hide()");
+        PrimeFaces.current().ajax().update("main:messages", "main:dt-routes");
     }
 
     public List<Route> getAllRoutes() {

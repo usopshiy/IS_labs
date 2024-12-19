@@ -29,7 +29,7 @@
                 <p:menuitem value="administration" outcome="admin"/>
             </p:menubar>
         </h:form>
-        <h:form>
+        <h:form id="main">
             <p:toolbar>
                 <p:toolbarGroup>
                     <p:commandButton value="New" icon="pi pi-plus" actionListener="#{route_bean.openNew()}"
@@ -40,34 +40,34 @@
                 </p:toolbarGroup>
             </p:toolbar>
             <f:websocket channel="pushContext" onMessage="#{route_bean.filterUserRoutes()}">
-                <p:ajax event="update" update="@form"/>
+                <p:ajax event="update" update="main:dt-routes"/>
             </f:websocket>
             <p:dataTable value="#{route_bean.routes}" var="route" rows="10" id="dt-routes" class="dt-routes"
                          paginator="true" paginatorPosition="bottom" filteredValue="#{route_bean.filteredRoutes}"
                          paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                          currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records">
-                <p:column headerText="id" filterBy="#{route.id}" sortBy="#{route.id}">
+                <p:column field="id" filterMatchMode="contains">
                     <h:outputText value="#{route.id}"/>
                 </p:column>
-                <p:column headerText="onwer" filterBy="#{route.owner.username}" sortBy="#{route.owner.username}">
-                    <h:outputText value="#{route.owner.username}"/>
+                <p:column field="owner" filterMatchMode="contains">
+                    <h:outputText value="#{route.owner}"/>
                 </p:column>
-                <p:column headerText="name" filterBy="#{route.name}" sortBy="#{route.name}">
+                <p:column field="name" filterMatchMode="contains">
                     <h:outputText value="#{route.name}"/>
                 </p:column>
-                <p:column headerText="coordinates" filterBy="#{route.coordinates.toString()}" sortBy="#{route.coordinates.toString()}">
-                    <h:outputText value="#{route.coordinates.toString()}"/>
+                <p:column field="coordinates" filterMatchMode="contains">
+                    <h:outputText value="#{route.coordinates}"/>
                 </p:column>
-                <p:column headerText="from" filterBy="#{route.from.toString()}" sortBy="#{route.from.toString()}">
-                    <h:outputText value="#{route.from.toString()}"/>
+                <p:column field="from" filterMatchMode="contains">
+                    <h:outputText value="#{route.from}"/>
                 </p:column>
-                <p:column headerText="to" filterBy="#{route.to.toString()}" sortBy="#{route.to.toString()}">
-                    <h:outputText value="#{route.to.toString()}"/>
+                <p:column field="to" filterMatchMode="contains">
+                    <h:outputText value="#{route.to}"/>
                 </p:column>
-                <p:column headerText="distance" filterBy="#{route.distance}" sortBy="#{route.distance}">
+                <p:column field="distance" filterMatchMode="contains">
                     <h:outputText value="#{route.distance}"/>
                 </p:column>
-                <p:column headerText="rating" filterBy="#{route.rating}" sortBy="#{route.rating}">
+                <p:column field="rating" filterMatchMode="contains">
                     <h:outputText value="#{route.rating}"/>
                 </p:column>
                 <p:column exportable="false" ariaHeaderText="Actions">
