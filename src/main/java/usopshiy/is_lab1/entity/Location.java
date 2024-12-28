@@ -1,5 +1,7 @@
 package usopshiy.is_lab1.entity;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -8,13 +10,28 @@ import java.io.Serializable;
 @Entity
 @Table(name="LOCATIONS")
 @NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode
 public class Location implements Comparable<Location>, Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    @JsonCreator
+    public Location(
+            @JsonProperty("id") long id,
+            @JsonProperty("x") long x,
+            @JsonProperty("y") Double y,
+            @JsonProperty("z") double z
+    ) {
+        this.id = id;
+        this.x = x;
+        if (y == null) {
+            throw new IllegalArgumentException("location y cannot be null");
+        }
+        this.y = y;
+        this.z = z;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

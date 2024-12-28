@@ -25,6 +25,7 @@
                     <p:menuitem value="Special" action="#{route_bean.toOperation()}"/>
                 </p:submenu>
                 <p:menuitem value="administration" outcome="admin"/>
+                <p:menuitem value="importslog" outcome="inputs"/>
             </p:menubar>
         </h:form>
         <h:form id="main">
@@ -216,15 +217,15 @@
                     <div class="field">
                         <p:outputLabel for="@next">Sorting filter</p:outputLabel>
                         <p:selectOneMenu value="#{route_bean.filter}" required="true">
-                            <f:selectItem value="id"/>
-                            <f:selectItem value="name"/>
-                            <f:selectItem value="coordinates"/>
+                            <f:selectItem itemValue="id" itemLabel="id"/>
+                            <f:selectItem itemValue="name" itemLabel="name"/>
+                            <f:selectItem itemValue="coordinates" itemLabel="coordinates"/>
                             <f:selectItem itemValue="creationDate" itemLabel="creation date"/>
-                            <f:selectItem value="from"/>
-                            <f:selectItem value="to"/>
-                            <f:selectItem value="distance"/>
-                            <f:selectItem value="rating"/>
-                            <f:selectItem value="owner"/>
+                            <f:selectItem itemValue="from" itemLabel="from"/>
+                            <f:selectItem itemValue="to" itemLabel="to"/>
+                            <f:selectItem itemValue="distance" itemLabel="distance"/>
+                            <f:selectItem itemValue="rating" itemLabel="rating"/>
+                            <f:selectItem itemValue="owner" itemLabel="owner"/>
                         </p:selectOneMenu>
                     </div>
                 </p:outputPanel>

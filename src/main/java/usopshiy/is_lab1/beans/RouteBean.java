@@ -1,5 +1,7 @@
 package usopshiy.is_lab1.beans;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.ManagedBean;
 import jakarta.annotation.PostConstruct;
 import jakarta.ejb.EJB;
@@ -12,14 +14,23 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.AjaxBehaviorEvent;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import jakarta.transaction.TransactionRolledbackException;
+import jakarta.transaction.Transactional;
+import jakarta.transaction.TransactionalException;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.PrimeFaces;
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.file.UploadedFile;
+import usopshiy.is_lab1.entity.Import;
 import usopshiy.is_lab1.entity.Route;
+import usopshiy.is_lab1.services.ImportService;
 import usopshiy.is_lab1.services.RoutesService;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @ManagedBean
@@ -62,6 +73,9 @@ public class RouteBean implements Serializable {
 
     @EJB
     private RoutesService routesService;
+
+    @EJB
+    private ImportService importService;
 
     @PostConstruct
     public void setRoutes() {
@@ -117,6 +131,60 @@ public class RouteBean implements Serializable {
     public void deleteRoute() {
         routesService.deleteRoute(route);
         routes.remove(route);
+        PrimeFaces.current().ajax().update("main:messages", "main:dt-routes");
+    }
+
+    @Transactional
+    public void saveRoutes(FileUploadEvent event) {
+        UploadedFile file = event.getFile();
+        String json = new String(file.getContent(), StandardCharsets.UTF_8);
+        System.out.println(json);
+        Import imp = new Import();
+        imp.setUser(userBean.getUser());
+        List<Route> routeList;
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            routeList = mapper.readValue(json, new TypeReference<List<Route>>() {
+            });
+        } catch (IOException e) {
+            imp.setText("fail");
+            imp.setAmount(0);
+            importService.addImport(imp);
+            PrimeFaces.current().executeScript("PF('uploadRoutesDialog').hide()");
+            PrimeFaces.current().ajax().update("main:messages", "main:dt-routes");
+            throw new RuntimeException(e);
+        } catch (IllegalArgumentException e) {
+            imp.setText("fail");
+            imp.setAmount(0);
+            importService.addImport(imp);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Illegal argument", e.getMessage()));
+            PrimeFaces.current().executeScript("PF('uploadRoutesDialog').hide()");
+            PrimeFaces.current().ajax().update("main:messages", "main:dt-routes");
+            throw new RuntimeException(e);
+        } catch (TransactionalException e) {
+            imp.setText("fail");
+            imp.setAmount(0);
+            importService.addImport(imp);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Transaction wasn't complete", e.getMessage()));
+            PrimeFaces.current().executeScript("PF('uploadRoutesDialog').hide()");
+            PrimeFaces.current().ajax().update("main:messages", "main:dt-routes");
+            throw new RuntimeException(e);
+        }
+        for (Route route : routeList) {
+            route.setOwner(userBean.getUser());
+        }
+        try {
+            routesService.addRoutes(routeList);
+            imp.setText("success");
+            imp.setAmount(routeList.size());
+            filterUserRoutes();
+        }
+        catch (Exception e) {
+            imp.setText("fail");
+            imp.setAmount(0);
+        }
+        importService.addImport(imp);
+        PrimeFaces.current().executeScript("PF('uploadRoutesDialog').hide()");
         PrimeFaces.current().ajax().update("main:messages", "main:dt-routes");
     }
 

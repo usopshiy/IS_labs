@@ -25,6 +25,7 @@
                     <p:menuitem value="Special" action="#{route_bean.toOperation()}"/>
                 </p:submenu>
                 <p:menuitem value="administration" outcome="admin"/>
+                <p:menuitem value="importslog" outcome="inputs"/>
             </p:menubar>
         </h:form>
         <f:websocket channel="pushContext" onMessage="#{route_bean.setRoutes()}"/>

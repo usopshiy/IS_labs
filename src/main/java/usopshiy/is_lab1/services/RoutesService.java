@@ -5,6 +5,7 @@ import jakarta.ejb.Stateless;
 import jakarta.faces.push.Push;
 import jakarta.faces.push.PushContext;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import org.primefaces.component.message.Message;
 import usopshiy.is_lab1.db.RouteDAO;
 import usopshiy.is_lab1.entity.Location;
@@ -48,6 +49,12 @@ public class RoutesService {
 
     public void addRoute(Route route) {
         routeDAO.addRoute(route);
+        updateViews();
+    }
+
+    @Transactional
+    public void addRoutes(List<Route> routes) {
+        routeDAO.addRoutes(routes);
         updateViews();
     }
 

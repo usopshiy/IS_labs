@@ -22,17 +22,17 @@
                            <div class="ui-inputgroup-addon">
                                <i class="pi pi-user"/>
                            </div>
-                            <p:inputText placeholder="Username" value="#{userBean.user.username}" required="true"/>
+                            <p:inputText id="username" placeholder="Username" value="#{userBean.user.username}" required="true"/>
                         </div>
                     </p:row>
                     <p:row>
                         <p:outputLabel for="@next" value="Password"/>
                         <div class="ui-inputgroup">
-                            <p:password value="#{userBean.user.password}" toggleMask="true" redisplay="true" required="true"/>
+                            <p:password id="pass" value="#{userBean.user.password}" toggleMask="true" redisplay="true" required="true"/>
                         </div>
                     </p:row>
                     <p:row>
-                        <p:commandButton value="Log In" action="#{userBean.login()}" update="login_form"/>
+                        <p:commandButton id="login" value="Log In" action="#{userBean.login()}" update="login_form"/>
                     </p:row>
                     <p:row>
                         <p:outputLabel for="@next" value="No account Yet?"/>

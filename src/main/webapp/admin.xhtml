@@ -24,6 +24,7 @@
                 <p:menuitem value="Special" action="#{route_bean.toOperation()}"/>
             </p:submenu>
             <p:menuitem value="administration" outcome="admin"/>
+            <p:menuitem value="importslog" outcome="inputs"/>
         </p:menubar>
         <h:form rendered="#{!(userBean.user.admin)}" id="requestForm">
             <p:panelGrid>
@@ -40,10 +41,10 @@
                          paginator="true" paginatorPosition="bottom" filteredValue="#{userBean.filteredRequests}"
                          paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                          currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records">
-                <p:column headerText="User ID" filterBy="#{user.id}" sortBy="#{user.id}">
+                <p:column field="id" filterMatchMode="contains">
                     <h:outputText value="#{user.id}"/>
                 </p:column>
-                <p:column headerText="Username" sortBy="#{user.username}" filterBy="#{user.username}">
+                <p:column field="username" filterMatchMode="contains">
                     <h:outputText value="#{user.username}"/>
                 </p:column>
                 <p:column exportable="false" HeaderText="Actions">

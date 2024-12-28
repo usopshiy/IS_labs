@@ -27,6 +27,7 @@
         <mapping class="usopshiy.is_lab1.entity.Location"/>
         <mapping class="usopshiy.is_lab1.entity.Coordinates"/>
         <mapping class="usopshiy.is_lab1.entity.Change"/>
+        <mapping class="usopshiy.is_lab1.entity.Import"/>
 
     </session-factory>
 </hibernate-configuration>

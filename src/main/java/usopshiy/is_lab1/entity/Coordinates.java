@@ -1,5 +1,7 @@
 package usopshiy.is_lab1.entity;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import lombok.*;
@@ -10,7 +12,6 @@ import java.io.Serializable;
 @Setter
 @Entity
 @Table(name="COORDINATES")
-@AllArgsConstructor
 @EqualsAndHashCode
 public class Coordinates implements Comparable<Coordinates>, Serializable {
 
@@ -39,6 +40,21 @@ public class Coordinates implements Comparable<Coordinates>, Serializable {
         this.id = 0;
         this.x = 0F;
         this.y = 0;
+    }
+
+    @JsonCreator
+    public Coordinates(@JsonProperty("id") long id,
+                       @JsonProperty("x") Float x,
+                       @JsonProperty("y") long y) {
+        this.id = id;
+        if (x == null) {
+            throw new IllegalArgumentException("x cannot be null");
+        }
+        this.x = x;
+        if (y > 291) {
+            throw new IllegalArgumentException("y cannot be greater than 291");
+        }
+        this.y = y;
     }
 
     @Override

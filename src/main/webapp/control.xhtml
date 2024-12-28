@@ -27,15 +27,23 @@
                     <p:menuitem value="Special" action="#{route_bean.toOperation()}"/>
                 </p:submenu>
                 <p:menuitem value="administration" outcome="admin"/>
+                <p:menuitem value="importslog" outcome="inputs"/>
             </p:menubar>
         </h:form>
         <h:form id="main">
+            <p:growl id="growl" showDetail="true"/>
+            <p:growl id="msg"/>
             <p:toolbar>
                 <p:toolbarGroup>
                     <p:commandButton value="New" icon="pi pi-plus" actionListener="#{route_bean.openNew()}"
                                      update=":dialogs:manage-route-content" oncomplete="PF('manageRouteDialog').show()"
                                      styleClass="ui-button-success" style="margin-right: .5rem">
                         <p:resetInput target=":dialogs:manage-route-content" />
+                    </p:commandButton>
+                    <p:commandButton value="Upload" icon="pi pi-upload"
+                                     update=":dialogs:uploadRoutes" oncomplete="PF('uploadRoutesDialog').show()"
+                                     styleClass="ui-button-info" style="margin-right: .5rem">
+                        <p:resetInput target=":dialogs:uploadRoutes" />
                     </p:commandButton>
                 </p:toolbarGroup>
             </p:toolbar>
@@ -154,6 +162,15 @@
                     <p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('manageRouteDialog').hide()"
                                      class="ui-button-secondary" type="button" />
                 </f:facet>
+            </p:dialog>
+
+            <p:dialog header="Upload file" showEffect="fade" modal="true" widgetVar="uploadRoutesDialog"
+                      responsive="true" id="uploadRoutesDialog">
+                <p:outputPanel id="uploadRoutes" class="ui-fluid">
+                    <div class="field">
+                        <p:fileUpload listener="#{route_bean.saveRoutes}" label="upload" mode="advanced" allowTypes="/(\.|\/)(json)$/"/>
+                    </div>
+                </p:outputPanel>
             </p:dialog>
 
             <p:confirmDialog widgetVar="deleteRouteDialog" showEffect="fade" width="300"
