@@ -14,7 +14,6 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.AjaxBehaviorEvent;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import jakarta.transaction.TransactionRolledbackException;
 import jakarta.transaction.Transactional;
 import jakarta.transaction.TransactionalException;
 import lombok.Getter;
@@ -27,7 +26,6 @@ import usopshiy.is_lab1.entity.Route;
 import usopshiy.is_lab1.services.ImportService;
 import usopshiy.is_lab1.services.RoutesService;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
@@ -152,7 +150,7 @@ public class RouteBean implements Serializable {
             importService.addImport(imp);
             PrimeFaces.current().executeScript("PF('uploadRoutesDialog').hide()");
             PrimeFaces.current().ajax().update("main:messages", "main:dt-routes");
-            throw new RuntimeException(e);
+            return;
         } catch (IllegalArgumentException e) {
             imp.setText("fail");
             imp.setAmount(0);
@@ -160,7 +158,7 @@ public class RouteBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Illegal argument", e.getMessage()));
             PrimeFaces.current().executeScript("PF('uploadRoutesDialog').hide()");
             PrimeFaces.current().ajax().update("main:messages", "main:dt-routes");
-            throw new RuntimeException(e);
+            return;
         } catch (TransactionalException e) {
             imp.setText("fail");
             imp.setAmount(0);
@@ -168,18 +166,19 @@ public class RouteBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Transaction wasn't complete", e.getMessage()));
             PrimeFaces.current().executeScript("PF('uploadRoutesDialog').hide()");
             PrimeFaces.current().ajax().update("main:messages", "main:dt-routes");
-            throw new RuntimeException(e);
+            return;
         }
         for (Route route : routeList) {
             route.setOwner(userBean.getUser());
         }
         try {
-            routesService.addRoutes(routeList);
+            routesService.addRoutes(routeList, file, userBean.getUser().getUsername());
             imp.setText("success");
             imp.setAmount(routeList.size());
             filterUserRoutes();
         }
         catch (Exception e) {
+            System.out.println("im here");
             imp.setText("fail");
             imp.setAmount(0);
         }

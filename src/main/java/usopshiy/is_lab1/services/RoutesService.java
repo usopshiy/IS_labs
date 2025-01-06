@@ -7,6 +7,7 @@ import jakarta.faces.push.PushContext;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.primefaces.component.message.Message;
+import org.primefaces.model.file.UploadedFile;
 import usopshiy.is_lab1.db.RouteDAO;
 import usopshiy.is_lab1.entity.Location;
 import usopshiy.is_lab1.entity.Route;
@@ -20,7 +21,10 @@ import java.util.stream.Collectors;
 public class RoutesService {
 
     @EJB
-    private final RouteDAO routeDAO = new RouteDAO();
+    private RouteDAO routeDAO;
+
+    @EJB
+    private MinIOService minIOService;
 
     @Inject @Push(channel = "pushContext")
     private PushContext pushContext;
@@ -52,10 +56,17 @@ public class RoutesService {
         updateViews();
     }
 
-    @Transactional
-    public void addRoutes(List<Route> routes) {
-        routeDAO.addRoutes(routes);
-        updateViews();
+    public void addRoutes(List<Route> routes, UploadedFile file, String username) {
+        try {
+            routeDAO.addRoutes(routes);
+            // throw new RuntimeException("logic exception happened!")
+            minIOService.uploadFile(file, username);
+            routeDAO.commit();
+            updateViews();
+        } catch (Exception e) {
+            routeDAO.rollback();
+            throw new RuntimeException(e);
+        }
     }
 
     public Route getRouteById(Integer id) {

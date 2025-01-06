@@ -4,6 +4,9 @@ import jakarta.ejb.Stateless;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import jakarta.transaction.TransactionalException;
+import lombok.Getter;
+import org.hibernate.HibernateException;
+import org.hibernate.JDBCException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -15,7 +18,8 @@ import java.util.List;
 @Stateless
 public class RouteDAO {
 
-    Session session;
+    @Getter
+    private final Session session;
 
     public RouteDAO() {
         SessionFactory sessionFactory;
@@ -32,12 +36,12 @@ public class RouteDAO {
     }
 
     public void addRoutes(List<Route> routes) {
+        //throw new HibernateException("cant connect to db");
         try {
             session.getTransaction().begin();
             for (Route route : routes) {
                 session.merge(route);
             }
-            session.getTransaction().commit();
         } catch (Exception e) {
             if (session.getTransaction().isActive()){
                 session.getTransaction().rollback();
@@ -62,8 +66,22 @@ public class RouteDAO {
     }
 
     public void deleteRoute(Route route) {
+        System.out.println(session.getTransaction().isActive());
         session.getTransaction().begin();
         session.remove(route);
         session.getTransaction().commit();
+    }
+
+    public void rollback() {
+        System.out.println(session.getTransaction().isActive());
+        if (session.getTransaction().isActive()){
+            session.getTransaction().rollback();
+        }
+    }
+
+    public void commit() {
+        if (session.getTransaction().isActive()){
+            session.getTransaction().commit();
+        }
     }
 }
